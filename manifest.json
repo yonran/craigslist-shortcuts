@@ -1,0 +1,21 @@
+{
+  "name": "Craigslist Shortcuts",
+  "version": "0.0.1",
+
+  "description": "A simple script on top of Craigslist to add keyboard shortcuts.",
+
+  "content_scripts": [
+    {
+      "matches": ["http://*.craigslist.org/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "permissions": [
+    "http://*.craigslist.org/*",
+    "tabs"
+  ]
+}
