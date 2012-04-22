@@ -1,0 +1,105 @@
+<canvas width=128 height=128></canvas>
+<canvas width=440 height=280></canvas>
+<script>
+var canvas = document.querySelector("canvas");
+var c = canvas.getContext("2d");
+drawIcon(c);
+var promoCanvas = document.querySelectorAll("canvas")[1];
+c = promoCanvas.getContext("2d");
+drawPromoImage(c);
+
+//c.strokeRect(32,32,96,96);
+function drawIcon(c) {
+  var peaceRadius = 45;
+  c.save();
+  c.translate(peaceRadius + 3 + 32,peaceRadius + 3 + 32);
+  c.strokeStyle = "#551A8B";
+  c.lineWidth = 4;
+  drawPeace(peaceRadius);
+  c.restore();
+
+  c.save();
+  var buttonWidth = 36;
+  c.translate(32 + 48 - buttonWidth - 4,50);
+  drawButton(c, buttonWidth, "J")
+  c.restore();
+  c.save();
+  c.translate(32 + 48 + 4,50);
+  drawButton(c, buttonWidth, "K")
+  c.restore();
+}
+function drawPromoImage(c) {
+  c.fillStyle = "#444";
+  c.fillRect(0,0,440,280);
+  var peaceRadius = 100;
+  c.save();
+  c.translate(peaceRadius + 3 + 30,peaceRadius + 3 + 30);
+  c.strokeStyle = "#baf";
+  c.lineWidth = 7;
+  drawPeace(peaceRadius);
+  c.restore();
+
+  c.save();
+  var buttonWidth = 70;
+  c.translate(270,90);
+  drawButton(c, buttonWidth, "J")
+  c.restore();
+  c.save();
+  c.translate(270 + 5 + buttonWidth,90);
+  drawButton(c, buttonWidth, "K")
+  c.restore();
+}
+
+
+function drawPeace(peaceRadius) {
+  c.arc(0,0,peaceRadius,2*Math.PI,false);
+  c.moveTo(0,-peaceRadius);
+  c.lineTo(0,peaceRadius);
+  c.moveTo(0,0);
+  var pi = Math.PI;
+  c.lineTo(peaceRadius*Math.cos(pi/2 + pi*1/4),peaceRadius*Math.sin(pi/2 + pi*1/4));
+  c.moveTo(0,0);
+  c.lineTo(peaceRadius*Math.cos(pi/2 - pi*1/4),peaceRadius*Math.sin(pi/2 - pi*1/4));
+  c.stroke();
+}
+
+// Draws a button from (0, 0) to (buttonWidth, buttonWidth)
+function drawButton(c, buttonWidth, key) {
+  c.fillStyle = "#000";
+  roundedRect(c, 0, 0, buttonWidth, buttonWidth, 6);
+  c.fill();
+
+  var gradient = c.createLinearGradient(0,2,0,buttonWidth - 2);
+  gradient.addColorStop(0, "#444");
+  gradient.addColorStop(.333, "#333");
+  gradient.addColorStop(.666, "#333");
+  gradient.addColorStop(1, "#444");
+  c.fillStyle = gradient;
+  c.strokeStyle = "#666";
+  c.lineWidth = 1;
+  roundedRect(c, 2, 2, buttonWidth - 4, buttonWidth - 4, 4);
+  c.fill();
+  c.stroke();
+
+  c.fillStyle = "#ddf";
+  c.font = "bold " + buttonWidth*3/7 + "px Arial";
+  c.textAlign = "center";
+  c.textBaseline = "middle";
+  c.fillText(key, buttonWidth/2, buttonWidth/2);
+}
+
+// copied from mdn canvas tutorial:
+// https://developer.mozilla.org/en/Canvas_tutorial/Drawing_shapes
+function roundedRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x,y+radius);
+  ctx.lineTo(x,y+height-radius);
+  ctx.quadraticCurveTo(x,y+height,x+radius,y+height);
+  ctx.lineTo(x+width-radius,y+height);
+  ctx.quadraticCurveTo(x+width,y+height,x+width,y+height-radius);
+  ctx.lineTo(x+width,y+radius);
+  ctx.quadraticCurveTo(x+width,y,x+width-radius,y);
+  ctx.lineTo(x+radius,y);
+  ctx.quadraticCurveTo(x,y,x,y+radius);
+}
+</script>
