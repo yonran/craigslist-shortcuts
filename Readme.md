@@ -1,16 +1,28 @@
-Chrome Shortcuts
-=
+Craigslist Shortcuts
+======
 
-Once you install this extension, you can use these Gmail-style (vim-inspired) keyboard shortcuts:
+Once you install this extension for the Chrome browser, you can use these Gmail-style (vim-inspired) keyboard shortcuts:
 
-Within a detail page:
+Within a craigslist.org detail page:
 
 - <kbd>j</kbd>: navigate to older item
 - <kbd>k</kbd>: navigate to newer item
 - <kbd>!</kbd>: mark as spam
 - <kbd>u</kbd>: go back to index
 
-Within an index page:
+Within a craigslist.org index page:
 
 - <kbd>j</kbd>: focus on older item
 - <kbd>k</kbd>: focus on newer item
+
+
+Install
+----
+
+You can install the [published version of Craigslist Shortcuts](https://chrome.google.com/webstore/detail/fpkpfjpnegjenkallpheifeejplgfego) at the Chrome Web Store.
+
+To install from source, navigate to chrome://extensions, enable the “Developer Mode” checkbox, click the “Load unpacked extension…” button, and select the checked-out folder that contains the manifest.json file. There’s no preprocessing step.
+
+License/Copyright
+----
+This script is too simple to bother with licenses. Therefore, it is released to the public domain.
