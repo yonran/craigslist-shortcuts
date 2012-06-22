@@ -1,3 +1,11 @@
+// ==UserScript==
+// @name          Craigslist Shortcuts
+// @namespace     https://github.com/yonran/craigslist-shortcuts
+// @description   Gmail-style (vim-inspired) keyboard shortcuts.
+// @include       http://*.craigslist.org/*
+// @version       0.0.3
+// ==/UserScript==
+
 if ("/search" === location.pathname.substring(0, "/search".length) ||
     "/" === location.pathname.charAt(location.pathname.length - 1)) {
   // A results page
