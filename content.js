@@ -6,13 +6,15 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
   var resultsData = resultsLinks.map(function(a) {
     return {url: a.href, title: a.textContent};
   });
-  chrome.extension.sendRequest({action: "gotResults", results: resultsData}, function(res) {
-    if (res.lastFocusedUrl) {
-      var lastFocusedLink = resultsLinks.filter(function(a) {return a.href === res.lastFocusedUrl;})[0];
-      if (lastFocusedLink)
-        lastFocusedLink.focus();
-    }
-  });
+  sessionStorage.mostRecentIndexUrl = location.href;
+  sessionStorage.mostRecentResults = JSON.stringify(resultsData);
+  if (sessionStorage.mostRecentResultUrl) {
+    var lastFocusedLink = resultsLinks.filter(function(a) {return a.href === sessionStorage.mostRecentResultUrl;})[0];
+    if (lastFocusedLink)
+      lastFocusedLink.focus();
+  }
+  resultsLinks = resultsData = null;
+
   document.addEventListener("keypress", function(e) {
     var key = String.fromCharCode(e.charCode);
     if ("j" === key || "k" === key) {
@@ -27,7 +29,7 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
       var link = resultsLinks[newIndex];
       if (! link) return;
       link.focus();
-      chrome.extension.sendRequest({action: "setLastFocusedUrl", url: link.href});
+      sessionStorage.mostRecentResultUrl = link.href;
       e.preventDefault();
       e.stopPropagation();
     } else {
@@ -36,22 +38,35 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
   }, null);
 } else {
   // A detail page
-  chrome.extension.sendRequest({action: "setLastFocusedUrl", url: location.href});
+  sessionStorage.mostRecentResultUrl = location.href;
   document.addEventListener("keypress", function(e) {
-    var navigateKeyToName = {
-      "j": "get-older-url",
-      "k": "get-newer-url",
-      "u": "get-index-url"
-    };
-    var navigateName;
-    if (null != (navigateName = navigateKeyToName[String.fromCharCode(e.charCode)])) {
-      chrome.extension.sendRequest({action: navigateName}, function(url) {
-        console.log(navigateName + " response:",url);
-        if (url) {
-          location.href = url;
+    var key = String.fromCharCode(e.charCode);
+    if ("j" === key || "k" === key) {
+      var incr = "j" === key ? 1 : -1;  // 1 means older, -1 means newer
+      var results;
+      if (sessionStorage.mostRecentResults &&
+          (results = JSON.parse(sessionStorage.mostRecentResults)) &&
+          0 < results.length) {
+        var currentIndex = null;
+        for (var i = 0; i < results.length; i++) {
+          var result = results[i];
+          if (result && result.url === location.href) {
+            currentIndex = i;
+            break;
+          }
         }
-      });
-    } else if ("!".charCodeAt(0) === e.charCode) {
+        var newResult;
+        if (null != currentIndex &&
+            (newResult = results[currentIndex + incr]) &&
+            newResult.url) {
+          location.href = newResult.url;
+        }
+      }
+    } else if ("u" === key) {
+      if (sessionStorage.mostRecentIndexUrl) {
+        location.href = sessionStorage.mostRecentIndexUrl;
+      }
+    } else if ("!" === key) {
       var spamIterator = document.evaluate(
           "//a[normalize-space(.)='spam/overpost']", document, null, XPathResult.ANY_TYPE, null);
       var spamLink = spamIterator.iterateNext();
