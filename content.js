@@ -6,6 +6,8 @@
 // @version       0.0.4
 // ==/UserScript==
 
+var isFromChromeWebStore = true;
+
 if ("/search" === location.pathname.substring(0, "/search".length) ||
     "/" === location.pathname.charAt(location.pathname.length - 1)) {
   // A results page
@@ -38,11 +40,14 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
       if (! link) return;
       link.focus();
       sessionStorage.mostRecentResultUrl = link.href;
-      e.preventDefault();
-      e.stopPropagation();
+    } else if ("?" == key) {
+      if (help == null) help = new Help(true);
+      help.toggle();
     } else {
       return;
     }
+    e.preventDefault();
+    e.stopPropagation();
   }, null);
 } else {
   // A detail page
@@ -86,6 +91,9 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
       syntheticClick.initMouseEvent(
           "click", true, true, null, null, 0, 0, 0, 0, false, false, false, false, 0, null);
       spamLink.dispatchEvent(syntheticClick);
+    } else if ("?" == key) {
+      if (help == null) help = new Help(false);
+      help.toggle();
     } else {
       return;
     }
@@ -93,3 +101,90 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
     e.stopPropagation();
   }, false);
 }
+
+var help = null;
+// constructor
+function Help(isIndexPage) {
+  var div = this.div = document.createElement("div");
+  div.className = "keyboardHelp";
+  div.setAttribute("style",
+    "background: black; color: white; opacity: .7; z-index: 1002; " +
+    "position: fixed; top: 5%; width: 92%; left: 4%; overflow: auto; " +
+    "padding: 1em; " +
+    "font-family: sans-serif; font-weight: bold;"
+  );
+  var tableContents = isIndexPage ?
+    "<tr><td>j<td>focus on older item\n" +
+    "<tr><td>k<td>focus on newer item\n" +
+    "<tr><td>?<td>show this help\n"
+    :
+    "<tr><td>j<td>navigate to older item\n" +
+    "<tr><td>k<td>navigate to newer item\n" +
+    "<tr><td>!<td>mark as spam\n" +
+    "<tr><td>u<td>go back to index\n" +
+    "<tr><td>?<td>show this help\n";
+  var sourceLink = isFromChromeWebStore ?
+    "<a href=\"https://chrome.google.com/webstore/detail/fpkpfjpnegjenkallpheifeejplgfego\">Chrome Web Store</a>\n" :
+    "<a href=\"http://userscripts.org/scripts/show/136751\">UserScript</a>\n";
+  div.innerHTML =
+    "<h1>Keyboard shortcuts</h1>\n" +
+    "<a href data-action=close style=\"color:yellow\">Close</a> |\n" +
+    sourceLink +
+    "<table style=\"color:white; font-weight: bold\">\n" +
+    tableContents +
+    "</table>";
+  Array.prototype.slice.call(div.querySelectorAll("a[data-action='close']")).forEach(function(a) {
+    a.addEventListener("click", onClickCloseLink, false);
+  });
+  div.addEventListener("click", onClickDiv, false);
+  var self = this;
+  function onClickDocument(e) {
+    if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey  || e.button > 0)
+      return;
+    self.close();
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  function onClickCloseLink(e) {
+    if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey  || e.button > 0)
+      return;
+    self.close();
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  function onClickDiv(e) {
+    if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey  || e.button > 0)
+      return;
+    // Prevent handling by the document click handler.
+    // But don't prevent default on links.
+    e.stopPropagation();
+  }
+  function onKeyDown(e) {
+    if (27 === e.keyCode) {
+      self.close();
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+  this.onClickDocument = onClickDocument;
+  this.onKeyDown = onKeyDown;
+}
+Help.prototype.open = function() {
+  document.addEventListener("click", this.onClickDocument, false);
+  document.addEventListener("keydown", this.onKeyDown, false);
+  document.body.appendChild(this.div);
+  this.isOpen = true;
+
+  var a = this.div.querySelector("a[data-action='close']");
+  if (a != null) a.focus();
+};
+Help.prototype.close = function() {
+  document.removeEventListener("click", this.onClickDocument, false);
+  document.removeEventListener("keydown", this.onKeyDown, false);
+  document.body.removeChild(this.div);
+  this.isOpen = false;
+};
+Help.prototype.toggle = function() {
+  if (this.isOpen) this.close();
+  else this.open();
+};
