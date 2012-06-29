@@ -3,7 +3,7 @@
 // @namespace     https://github.com/yonran/craigslist-shortcuts
 // @description   Gmail-style (vim-inspired) keyboard shortcuts.
 // @include       http://*.craigslist.org/*
-// @version       0.0.4
+// @version       0.0.5
 // ==/UserScript==
 
 var isFromChromeWebStore = true;

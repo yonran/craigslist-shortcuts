@@ -1,6 +1,7 @@
 {
   "name": "Craigslist Shortcuts",
-  "version": "0.0.4",
+  "version": "0.0.5",
+  "manifest_version": 2,
 
   "description": "A simple script on top of Craigslist to add keyboard shortcuts.",
 
@@ -12,7 +13,6 @@
   ],
 
   "permissions": [
-    "http://*.craigslist.org/*",
-    "tabs"
+    "http://*.craigslist.org/*"
   ]
 }
