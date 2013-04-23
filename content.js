@@ -3,15 +3,16 @@
 // @namespace     https://github.com/yonran/craigslist-shortcuts
 // @description   Gmail-style (vim-inspired) keyboard shortcuts.
 // @include       http://*.craigslist.org/*
-// @version       0.0.5
+// @version       0.0.6
 // ==/UserScript==
 
 var isFromChromeWebStore = true;
 
-if ("/search" === location.pathname.substring(0, "/search".length) ||
-    "/" === location.pathname.charAt(location.pathname.length - 1)) {
+debugger;
+if (document.querySelector('body.toc')) {
   // A results page
-  var resultsLinks = document.querySelectorAll("body > blockquote > p > a:link");
+  var RESULTS_QUERY = ".row > .title1 a:link";
+  var resultsLinks = document.querySelectorAll(RESULTS_QUERY);
   resultsLinks = Array.prototype.slice.call(resultsLinks);  // make it a real array
   var resultsData = resultsLinks.map(function(a) {
     return {url: a.href, title: a.textContent};
@@ -29,7 +30,7 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
     var key = String.fromCharCode(e.charCode);
     if ("j" === key || "k" === key) {
       var focused = document.activeElement;
-      var resultsLinks = document.querySelectorAll("body > blockquote > p > a:link");
+      var resultsLinks = document.querySelectorAll(RESULTS_QUERY);
       var currentIndex = Array.prototype.indexOf.call(resultsLinks, focused);
       var newIndex;
       if (-1 === currentIndex)
@@ -49,7 +50,7 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
     e.preventDefault();
     e.stopPropagation();
   }, null);
-} else {
+} else if (document.querySelector('body.posting')) {
   // A detail page
   sessionStorage.mostRecentResultUrl = location.href;
   document.addEventListener("keypress", function(e) {
@@ -81,7 +82,7 @@ if ("/search" === location.pathname.substring(0, "/search".length) ||
       }
     } else if ("!" === key) {
       var spamIterator = document.evaluate(
-          "//a[normalize-space(.)='spam/overpost']", document, null, XPathResult.ANY_TYPE, null);
+          "//*[class='flags']//a[normalize-space(.)='spam']", document, null, XPathResult.ANY_TYPE, null);
       var spamLink = spamIterator.iterateNext();
       if (! spamLink) {
         console.error("Could not find spam link.");
