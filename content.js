@@ -8,10 +8,9 @@
 
 var isFromChromeWebStore = true;
 
-debugger;
 if (document.querySelector('body.toc')) {
-  // A results page
   var RESULTS_QUERY = ".row > .title1 a:link";
+  // A results page
   var resultsLinks = document.querySelectorAll(RESULTS_QUERY);
   resultsLinks = Array.prototype.slice.call(resultsLinks);  // make it a real array
   var resultsData = resultsLinks.map(function(a) {
@@ -85,7 +84,7 @@ if (document.querySelector('body.toc')) {
           "//*[class='flags']//a[normalize-space(.)='spam']", document, null, XPathResult.ANY_TYPE, null);
       var spamLink = spamIterator.iterateNext();
       if (! spamLink) {
-        console.error("Could not find spam link.");
+        console.error("Craigslist shortcuts: Could not find spam link.");
         return;
       }
       var syntheticClick = document.createEvent("MouseEvent");
