@@ -81,7 +81,7 @@ if (document.querySelector('body.toc')) {
       }
     } else if ("!" === key) {
       var spamIterator = document.evaluate(
-          "//*[class='flags']//a[normalize-space(.)='spam']", document, null, XPathResult.ANY_TYPE, null);
+          "//*[@class='flags']//a[normalize-space(.)='spam']", document, null, XPathResult.ANY_TYPE, null);
       var spamLink = spamIterator.iterateNext();
       if (! spamLink) {
         console.error("Craigslist shortcuts: Could not find spam link.");
