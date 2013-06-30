@@ -8,11 +8,77 @@
 
 var isFromChromeWebStore = true;
 
+// Based on the bisect module in Python:
+// Copyright © 2001-2013 Python Software Foundation; All Rights Reserved
+// Find index to insert x in a after any entries that are equivalent to x.
+function bisect_right(a, x, lo, hi, cmp) {
+  if (lo < 0 || lo > a.length || ! (lo < hi))
+    throw Error("Invalid arguments to bisect_left: " + lo + "," + hi + "," + a.length);
+  while (lo < hi) {
+    var mid = (lo+hi)>>1, midEl = a[mid];
+    var c = cmp(midEl, x);
+    if (c <= 0)
+      lo = mid + 1;
+    else
+      hi = mid;
+  }
+  return lo;
+}
+// Find index to insert x in a before any entries that are equivalent to x.
+function bisect_left(a, x, lo, hi, cmp) {
+  if (lo < 0 || lo > a.length || ! (lo < hi))
+    throw Error("Invalid arguments to bisect_left: " + lo + "," + hi + "," + a.length);
+  while (lo < hi) {
+    var mid = (lo+hi)>>1, midEl = a[mid];
+    var c = cmp(midEl, x);
+    if (c < 0)
+      lo = mid + 1;
+    else
+      hi = mid;
+  }
+  return lo;
+}
+// Given a list of rows and an element in one row,
+// returns the next row or previous row.
+function findNextElementToFocus(a, x, backwards) {
+  if (0 === x.length)
+    return null;
+  function cmp(x, y) {
+    var mask = x.compareDocumentPosition(y);
+    if (mask & Node.DOCUMENT_POSITION_CONTAINED_BY || mask & Node.DOCUMENT_POSITION_CONTAINS)
+      return 0;
+    if (mask & Node.DOCUMENT_POSITION_FOLLOWING)  // x < y
+      return -1;
+    if (mask & Node.DOCUMENT_POSITION_PRECEDING)  // x > y
+      return 1;
+    if (mask & Node.DOCUMENT_POSITION_DISCONNECTED)
+      throw Error("Can't compare disconnected nodes");
+    throw Error("Can't unerstand compareDocumentPosition result " + mask);
+  }
+  var i;
+  if (backwards) {
+    i = bisect_left(a, x, 0, a.length, cmp) - 1;
+    if (i == -1)
+      i = 0;
+  } else {
+    i = bisect_right(a, x, 0, a.length, cmp);
+    if (i === a.length)
+      i = a.length - 1;
+  }
+  return a[i];
+}
+
 if (document.querySelector('body.toc')) {
-  var RESULTS_QUERY = ".row > .title1 a:link";
+  var ROWS_QUERY = ".row";
+  var LINK_IN_ROW_QUERY = ".pl a:link";
   // A results page
-  var resultsLinks = document.querySelectorAll(RESULTS_QUERY);
-  resultsLinks = Array.prototype.slice.call(resultsLinks);  // make it a real array
+  var rows = document.querySelectorAll(ROWS_QUERY);
+  var resultsLinks = [];
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var resultLink = row.querySelector(LINK_IN_ROW_QUERY);
+    resultsLinks.push(resultLink);
+  }
   var resultsData = resultsLinks.map(function(a) {
     return {url: a.href, title: a.textContent};
   });
@@ -29,15 +95,12 @@ if (document.querySelector('body.toc')) {
     var key = String.fromCharCode(e.charCode);
     if ("j" === key || "k" === key) {
       var focused = document.activeElement;
-      var resultsLinks = document.querySelectorAll(RESULTS_QUERY);
-      var currentIndex = Array.prototype.indexOf.call(resultsLinks, focused);
-      var newIndex;
-      if (-1 === currentIndex)
-        newIndex = 0;
-      else
-        newIndex = "j" === key ? currentIndex + 1 : currentIndex - 1;
-      var link = resultsLinks[newIndex];
-      if (! link) return;
+      var rows = document.querySelectorAll(ROWS_QUERY);
+      var backwards = "k" === key;
+      if (0 === rows.length)
+        return;
+      var row = findNextElementToFocus(rows, focused, backwards);
+      var link = row.querySelector(LINK_IN_ROW_QUERY);
       link.focus();
       sessionStorage.mostRecentResultUrl = link.href;
     } else if ("?" == key) {
