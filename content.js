@@ -67,6 +67,14 @@ function findNextElementToFocus(a, x, backwards) {
   }
   return a[i];
 }
+function elementHasDefaultForKeyTyping(element) {
+  var tagName = element.tagName.toLowerCase();
+  if (tagName === "input" && -1 === ["checkbox", "radio", "button", "submit"].indexOf(element.type) ||
+      tagName === "textarea") {
+    return true;  // Don't eat keys e.g. on the search box.
+  }
+  return false
+}
 
 if (document.querySelector('body.toc')) {
   var ROWS_QUERY = ".row";
@@ -92,12 +100,8 @@ if (document.querySelector('body.toc')) {
   resultsLinks = resultsData = null;
 
   document.addEventListener("keypress", function(e) {
-    var element = e.target;
-    var tagName = e.target.tagName.toLowerCase();
-    if (tagName === "input" && -1 === ["checkbox", "radio", "button", "submit"].indexOf(e.target.type) ||
-        tagName === "textarea") {
-      return;  // Don't eat keys e.g. on the search box.
-    }
+    if (elementHasDefaultForKeyTyping(e.target))
+      return;
     var key = String.fromCharCode(e.charCode);
     if ("j" === key || "k" === key) {
       var focused = document.activeElement;
@@ -127,12 +131,8 @@ if (document.querySelector('body.toc')) {
   // A detail page
   sessionStorage.mostRecentResultUrl = location.href;
   document.addEventListener("keypress", function(e) {
-    var element = e.target;
-    var tagName = e.target.tagName.toLowerCase();
-    if (tagName === "input" && -1 !== ["checkbox", "radio", "button"].indexOf(e.target.type) ||
-        tagName === "textarea") {
-      return;  // Don't eat keys e.g. on the search box.
-    }
+    if (elementHasDefaultForKeyTyping(e.target))
+      return;
     var key = String.fromCharCode(e.charCode);
     if ("j" === key || "k" === key) {
       var incr = "j" === key ? 1 : -1;  // 1 means older, -1 means newer
