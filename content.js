@@ -3,7 +3,7 @@
 // @namespace     https://github.com/yonran/craigslist-shortcuts
 // @description   Gmail-style (vim-inspired) keyboard shortcuts.
 // @include       http://*.craigslist.org/*
-// @version       0.0.6
+// @version       0.0.8
 // ==/UserScript==
 
 var isFromChromeWebStore = true;
@@ -99,7 +99,12 @@ if (document.querySelector('body.toc')) {
       var backwards = "k" === key;
       if (0 === rows.length)
         return;
-      var row = findNextElementToFocus(rows, focused, backwards);
+      var row;
+      if (document.body === focused) {
+        row = rows[0];
+      } else {
+        row = findNextElementToFocus(rows, focused, backwards);
+      }
       var link = row.querySelector(LINK_IN_ROW_QUERY);
       link.focus();
       sessionStorage.mostRecentResultUrl = link.href;
