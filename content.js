@@ -3,7 +3,7 @@
 // @namespace     https://github.com/yonran/craigslist-shortcuts
 // @description   Gmail-style (vim-inspired) keyboard shortcuts.
 // @include       http://*.craigslist.org/*
-// @version       0.0.8
+// @version       0.0.11
 // ==/UserScript==
 
 var isFromChromeWebStore = true;
@@ -92,6 +92,12 @@ if (document.querySelector('body.toc')) {
   resultsLinks = resultsData = null;
 
   document.addEventListener("keypress", function(e) {
+    var element = e.target;
+    var tagName = e.target.tagName.toLowerCase();
+    if (tagName === "input" && -1 === ["checkbox", "radio", "button", "submit"].indexOf(e.target.type) ||
+        tagName === "textarea") {
+      return;  // Don't eat keys e.g. on the search box.
+    }
     var key = String.fromCharCode(e.charCode);
     if ("j" === key || "k" === key) {
       var focused = document.activeElement;
@@ -121,6 +127,12 @@ if (document.querySelector('body.toc')) {
   // A detail page
   sessionStorage.mostRecentResultUrl = location.href;
   document.addEventListener("keypress", function(e) {
+    var element = e.target;
+    var tagName = e.target.tagName.toLowerCase();
+    if (tagName === "input" && -1 !== ["checkbox", "radio", "button"].indexOf(e.target.type) ||
+        tagName === "textarea") {
+      return;  // Don't eat keys e.g. on the search box.
+    }
     var key = String.fromCharCode(e.charCode);
     if ("j" === key || "k" === key) {
       var incr = "j" === key ? 1 : -1;  // 1 means older, -1 means newer

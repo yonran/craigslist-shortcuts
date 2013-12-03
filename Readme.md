@@ -19,7 +19,7 @@ Within a craigslist.org index page:
 Install
 ----
 
-You can install the [published version of Craigslist Shortcuts at the Chrome Web Store](https://chrome.google.com/webstore/detail/fpkpfjpnegjenkallpheifeejplgfego) or the [Greasemonkey file at userscripts.org](http://userscripts.org/scripts/show/136751).
+You can install the [published version of Craigslist Shortcuts at the Chrome Web Store](https://chrome.google.com/webstore/detail/craigslist-shortcuts/fpkpfjpnegjenkallpheifeejplgfego) or the [Greasemonkey file at userscripts.org](http://userscripts.org/scripts/show/136751).
 
 To install from source, navigate to chrome://extensions, enable the “Developer Mode” checkbox, click the “Load unpacked extension…” button, and select the checked-out folder that contains the manifest.json file. There’s no preprocessing step.
 
